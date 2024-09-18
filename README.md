@@ -1,5 +1,5 @@
 # Star-Citizen-commodities-averages
-This is a discord bot that uses the uexcorp api to find up-to-date commodities. this was made by me and Ossuno for personal use up until now
+This is a discord bot that uses the uexcorp api to find up-to-date commodities. this was made by me and Ossuno for personal use up until now. Ossuno is @Ossuno7092 on YT
 # How to use the bot
 You will want to replace the bot_token with your actual discord bot token. Then run it in python!
 # What commands are available
