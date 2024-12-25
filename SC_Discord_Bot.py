@@ -11,7 +11,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # API key and bot token
-bot_token = #'bot_token_here'
+bot_token = # 'Enter Bot Token Here'
 
 @bot.event
 async def on_ready():
@@ -185,21 +185,21 @@ async def NEW_CALC(ctx, name):
     headers = {
         'Content-Type': 'application/json'
     }
-    
+
     try:
-        
+
         response = requests.get(commodities_url, headers=headers)
-        
+
         if response.status_code == 200:
             try:
                 data = response.json()
 
-                
+
                 if 'data' not in data or not data['data']:
                     await ctx.send("No data found!")
                     return
-                
-                
+
+
                 buy_price = None
                 sell_price = None
                 for item in data['data']:
@@ -208,18 +208,18 @@ async def NEW_CALC(ctx, name):
                         sell_price = item.get("price_sell")
                         commodityName_JSON = item.get("name")
                         break
-                        
-                
+
+
                 if buy_price is None or sell_price is None:
                     raise Exception(f"Buy or Sell price not found for {commodityName}.")
                     return
 
-                
+
                 total_input = buy_price
                 total_return = sell_price
                 total_profit = total_return - total_input
 
-                
+
                 await ctx.send(f"Your aUEC input for {commodityName_JSON} should be: {total_input} per SCU")
                 await ctx.send(f"Your aUEC return from {commodityName_JSON} should be: {total_return} per SCU")
                 await ctx.send(f"Your aUEC profit from {commodityName_JSON} should be: {total_profit} per SCU")
@@ -236,61 +236,65 @@ async def NEW_CALC(ctx, name):
 
 
 @bot.command()
-async def NEW_SCU(ctx, name, scu_quant):
-    commodityName = name
-    commoditySCU = int(scu_quant)
-    commodities_url = "https://uexcorp.space/api/2.0/commodities"
-    headers = {
-        'Content-Type': 'application/json'
-    }
-    
+async def NEW_SCU(ctx, *, name_and_scu):
     try:
-        
+        # Split the input into name and SCU quantity
+        parts = name_and_scu.rsplit(' ', 1)
+        if len(parts) != 2:
+            await ctx.send("Invalid format. Use: `!NEW_SCU <Commodity Name> <SCU Quantity>`")
+            return
+
+        commodityName = parts[0]
+        commoditySCU = int(parts[1])
+
+        commodities_url = "https://uexcorp.space/api/2.0/commodities"
+        headers = {'Content-Type': 'application/json'}
+
         response = requests.get(commodities_url, headers=headers)
-        
+
         if response.status_code == 200:
             try:
                 data = response.json()
 
-                
                 if 'data' not in data or not data['data']:
                     await ctx.send("No data found!")
                     return
-                
-                
+
                 buy_price = None
                 sell_price = None
                 for item in data['data']:
-                    if (item.get("name") == commodityName):  # Code taken from Commodity calculator I made
+                    if item.get("name") == commodityName:
                         buy_price = item.get("price_buy")
                         sell_price = item.get("price_sell")
                         commodityName_JSON = item.get("name")
+                        is_illegal = item.get("is_illegal")
                         break
-                        
-                
+
                 if buy_price is None or sell_price is None:
-                    raise Exception(f"Buy or Sell price not found for {commodityName}.")
+                    await ctx.send(f"Buy or Sell price not found for {commodityName}.")
                     return
 
-                
                 total_input = buy_price * commoditySCU
                 total_return = sell_price * commoditySCU
                 total_profit = total_return - total_input
-
-                
+                if is_illegal == 1:
+                    await ctx.send(f"WARNING: This Commodity Is Illegal In Stanton by UEE law")
                 await ctx.send(f"Your aUEC input for {commodityName_JSON} should be: {total_input} per {commoditySCU} SCU")
                 await ctx.send(f"Your aUEC return from {commodityName_JSON} should be: {total_return} per {commoditySCU} SCU")
                 await ctx.send(f"Your aUEC profit from {commodityName_JSON} should be: {total_profit} per {commoditySCU} SCU")
 
-            except json.JSONDecodeError: # this provides as much response as possible if an error occurs so you may submit an issue on github or make your own modifications to the code
+            except json.JSONDecodeError:
                 await ctx.send("Error: The API response is not in the expected JSON format.")
         elif response.status_code == 401:
             await ctx.send("Error: Unauthorized access. Check your API key.")
         else:
             await ctx.send(f"Error: Failed to retrieve data. Status code: {response.status_code}")
             await ctx.send(f"Error details: {response.text}")
+    except ValueError:
+        await ctx.send("Invalid SCU quantity. Please provide a valid integer.")
     except Exception as e:
         await ctx.send(f"Error: {e}")
+
 
 
 
