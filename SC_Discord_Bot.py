@@ -142,7 +142,7 @@ async def commodities_averages(ctx, id):
         await ctx.send("Invalid ID format. Please provide a valid integer ID.")
         return
 
-    api_url = f'https://uexcorp.space/api/2.0/commodities_averages?id_commodity={int_id}'
+    api_url = f'https://api.uexcorp.space/2.0/commodities_averages?id_commodity={int_id}'
     headers = {
         'Content-Type': 'application/json',
     }
@@ -181,7 +181,7 @@ async def commodities_averages(ctx, id):
 @bot.command()
 async def NEW_CALC(ctx, name):
     commodityName = name
-    commodities_url = "https://uexcorp.space/api/2.0/commodities"
+    commodities_url = "https://api.uexcorp.space/2.0/commodities"
     headers = {
         'Content-Type': 'application/json'
     }
@@ -247,7 +247,7 @@ async def NEW_SCU(ctx, *, name_and_scu):
         commodityName = parts[0]
         commoditySCU = int(parts[1])
 
-        commodities_url = "https://uexcorp.space/api/2.0/commodities"
+        commodities_url = "https://api.uexcorp.space/2.0/commodities"
         headers = {'Content-Type': 'application/json'}
 
         response = requests.get(commodities_url, headers=headers)
